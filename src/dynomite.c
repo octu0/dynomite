@@ -64,6 +64,7 @@ static int show_version;
 static int test_conf;
 static int daemonize;
 static int describe_stats;
+static int initial_state_standby;
 
 static struct option long_options[] = {
     {"help", no_argument, NULL, 'h'},
@@ -79,9 +80,10 @@ static struct option long_options[] = {
     {"max-msgs", required_argument, NULL, 'M'},
     {"admin-operation", required_argument, NULL, 'x'},
     {"admin-param", required_argument, NULL, 'y'},
+    {"initial-state-standby", no_argument, NULL, 'S'},
     {NULL, 0, NULL, 0}};
 
-static char short_options[] = "hVtdDv:o:c:s:i:a:p:m:M:x:y";
+static char short_options[] = "hVtdDv:o:c:s:i:a:p:m:M:x:y:S";
 
 /**
  * Daemonize dynomite and redirect stdin, stdout and stderr to /dev/null.
@@ -233,7 +235,9 @@ static void dn_show_usage(void) {
       "%s)" CRLF
       "  -p, --pid-file=S             : set pid file (default: %s)" CRLF
       "  -m, --mbuf-size=N            : set size of mbuf chunk in bytes "
-      "(default: %d bytes)" CRLF "",
+      "(default: %d bytes)" CRLF ""
+      "  -S, --initial-state-standby  : Set the initial state to STANDBY "
+      "when gossip disabled" CRLF "",
       DN_LOG_DEFAULT, DN_LOG_MIN, DN_LOG_MAX,
       DN_LOG_PATH != NULL ? DN_LOG_PATH : "stderr", DN_CONF_PATH,
       DN_PID_FILE != NULL ? DN_PID_FILE : "off", 0);
@@ -426,6 +430,11 @@ static rstatus_t dn_get_options(int argc, char **argv, struct instance *nci) {
         admin_opt = (uint32_t)value;
 
         break;
+
+      case 'S':
+        initial_state_standby = 1;
+        break;
+
       case '?':
         switch (optopt) {
           case 'o':
@@ -557,7 +566,13 @@ static rstatus_t dn_run(struct instance *nci) {
   struct context *ctx = nci->ctx;
 
   struct server_pool *sp = &ctx->pool;
-  if (!sp->enable_gossip) core_set_local_state(ctx, NORMAL);
+  if (!sp->enable_gossip) {
+    if (initial_state_standby) {
+      core_set_local_state(ctx, STANDBY);
+    } else {
+      core_set_local_state(ctx, NORMAL);
+    }
+  }
 
   /* run rabbit run */
   for (;;) {
