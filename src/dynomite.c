@@ -236,7 +236,7 @@ static void dn_show_usage(void) {
       "  -p, --pid-file=S             : set pid file (default: %s)" CRLF
       "  -m, --mbuf-size=N            : set size of mbuf chunk in bytes "
       "(default: %d bytes)" CRLF ""
-      "  -S, --initial-state-standby  : Set the initial state to STANDBY "
+      "  -S, --initial-state-standby  : set initial state to STANDBY "
       "when gossip disabled" CRLF "",
       DN_LOG_DEFAULT, DN_LOG_MIN, DN_LOG_MAX,
       DN_LOG_PATH != NULL ? DN_LOG_PATH : "stderr", DN_CONF_PATH,

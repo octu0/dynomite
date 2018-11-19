@@ -55,7 +55,7 @@ To build Dynomite in _debug mode_:
       -c, --conf-file=S       : set configuration file (default: conf/dynomite.yml)
       -p, --pid-file=S        : set pid file (default: off)
       -x, --admin-operation=N : set size of admin operation (default: 0)
-      -S, --initial-state-standby  : Set the initial state to STANDBY when gossip disabled
+      -S, --initial-state-standby  : set initial state to STANDBY when gossip disabled
 
 
 ## Configuration
